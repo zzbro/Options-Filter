@@ -6,9 +6,6 @@ mySymbol = input('Please enter your company symbol')
 
 aCompanyInfo = financeO.FinanceOption(mySymbol)
 
-rows = {'ticker': mySymbol, 'Current Market Price': aCompanyInfo.get_current_market_price(),
-        'closest strikes': aCompanyInfo.get_closest_strikes()}
-
 myStrikes = aCompanyInfo.get_closest_strikes()
 myLowStrike = myStrikes[0]
 myHighStrike = myStrikes[1]
@@ -45,4 +42,3 @@ with open('@1_financeopts.csv', 'w+', newline='') as excel_fil:
                           calc_percentages(myHighPut['lastPrice'], myHighPut['strike'],
                                            aCompanyInfo.get_current_market_price()),
                           time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(aCompanyInfo.get_expiration_date()))])
-
