@@ -1,14 +1,8 @@
 import json
 from datetime import datetime
-import time
 import urllib.request
 
-
 BASE_URL = 'https://query2.finance.yahoo.com/v7/finance/options/'
-
-# just testing the time format.
-TIMESTAMP = time.time()
-TODAY = datetime.fromtimestamp(TIMESTAMP).strftime("%A")
 
 
 class FinanceOption:
@@ -16,6 +10,7 @@ class FinanceOption:
     __jsonInfo = {}
     __currentMarketPrice = 0
     __closestStrikes = []
+    __closestPuts = []
     __expirationDate = 0
 
     def __init__(self, symbol):
@@ -29,6 +24,7 @@ class FinanceOption:
         self.__ticker = symbol
         self.__currentMarketPrice = self.find_current_market_price()
         self.__closestStrikes = self.closest_calls_strikes()
+        self.__closestPuts = self.closest_put_strikes()
         self.__expirationDate = self.__closestStrikes[0]['expiration']
 
     def find_current_market_price(self):
@@ -46,23 +42,49 @@ class FinanceOption:
         high_strike_option = all_strikes[n + 1]
         return [low_strike_option, high_strike_option]
 
-    def get_bids(self):
-        low_bid = self.__closestStrikes[0]['bid']
-        high_bid = self.__closestStrikes[1]['bid']
+    # I could combine these two methods together but probably doesn't matter.
+    def closest_put_strikes(self):
+        all_strikes = self.__jsonInfo['optionChain']['result'][0]['options'][0]['puts']
+        n = 0
+        low_strike_option = all_strikes[n]
+        while (all_strikes[n+1]['strike'] < self.__currentMarketPrice):
+            n += 1
+            low_strike_option = all_strikes[n]
+        high_strike_option = all_strikes[n + 1]
+        return [low_strike_option, high_strike_option]
+
+    def get_bids(self, num):
+        if (num == 0):
+            low_bid = self.__closestStrikes[0]['bid']
+            high_bid = self.__closestStrikes[1]['bid']
+        else:
+            low_bid = self.__closestPuts[0]['bid']
+            high_bid = self.__closestPuts[0]['bid']
         return [low_bid, high_bid]
 
-    def get_asks(self):
-        low_ask = self.__closestStrikes[0]['ask']
-        high_ask = self.__closestStrikes[1]['ask']
+    def get_asks(self, num):
+        if (num == 0):
+            low_ask = self.__closestStrikes[0]['ask']
+            high_ask = self.__closestStrikes[1]['ask']
+        else:
+            low_ask = self.__closestPuts[0]['ask']
+            high_ask = self.__closestPuts[1]['ask']
         return [low_ask, high_ask]
 
-    def get_last_prices(self):
-        low_last_price = self.__closestStrikes[0]['lastPrice']
-        high_last_price = self.__closestStrikes[1]['lastPrice']
+    def get_last_prices(self, num):
+        if (num == 0):
+            low_last_price = self.__closestStrikes[0]['lastPrice']
+            high_last_price = self.__closestStrikes[1]['lastPrice']
+        else:
+            low_last_price = self.__closestPuts[0]['lastPrice']
+            high_last_price = self.__closestPuts[1]['lastPrice']
         return [low_last_price, high_last_price]
 
     def get_closest_strikes(self):
         return self.__closestStrikes
+
+    def get_closest_puts(self):
+        return self.__closestPuts
 
     def get_json(self):
         return self.__jsonInfo
@@ -76,13 +98,5 @@ class FinanceOption:
     def get_current_market_price(self):
         return self.__currentMarketPrice
 
-# Sample testing code
-
-aSymbol = FinanceOption('AMD')
-print(aSymbol.get_current_market_price())
-print(aSymbol.get_closest_strikes())
-print(aSymbol.get_last_prices())
-print(aSymbol.get_expiration_date())
-print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(aSymbol.get_expiration_date())))
-
-print(aSymbol.get_expiration_weekday())
+    def get_ticker(self):
+        return self.__ticker
