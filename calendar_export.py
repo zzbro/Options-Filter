@@ -1,6 +1,7 @@
 import csv
 import financeO
 import time
+import os
 
 mySymbol = input('Please enter your company symbol')
 
@@ -42,3 +43,10 @@ with open('@1_financeopts.csv', 'w+', newline='') as excel_fil:
                           calc_percentages(myHighPut['lastPrice'], myHighPut['strike'],
                                            aCompanyInfo.get_current_market_price()),
                           time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(aCompanyInfo.get_expiration_date()))])
+
+    dir_name = os.path.dirname(os.path.abspath(__file__))
+    absolute_path = os.path.join(dir_name, '@1_financeopts.csv')
+
+    print(absolute_path)
+    os.startfile(absolute_path)
+
