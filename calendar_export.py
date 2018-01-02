@@ -37,7 +37,7 @@ with open('@1_financeopts.csv', 'w+', newline='') as excel_fil:
                           time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(aCompanyInfo.get_expiration_date()))])
     file_writer.writerow([None,
                           None,
-                          None,
+                          myHighStrike['strike'],
                           myHighStrike['lastPrice'],
                           calc_percentages(myHighStrike['lastPrice'], myHighStrike['strike'],
                                            aCompanyInfo.get_current_market_price()),
@@ -45,3 +45,4 @@ with open('@1_financeopts.csv', 'w+', newline='') as excel_fil:
                           calc_percentages(myHighPut['lastPrice'], myHighPut['strike'],
                                            aCompanyInfo.get_current_market_price()),
                           time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(aCompanyInfo.get_expiration_date()))])
+
